@@ -1,7 +1,7 @@
 import { Client, Events, GatewayIntentBits } from 'discord.js';
 import genChar from './commands/gen-char.js'
 
-const supportedCommands=[genChar]
+const supportedCommands = [genChar]
 
 export function runDiscordBot(genAI, db) {
 
@@ -42,14 +42,17 @@ export function runDiscordBot(genAI, db) {
 
     client.on(Events.MessageCreate, async (message) => {
         if (message.author.bot || !message.content.startsWith('&ezdm')) return;
+        console.log(`got a message from ${message.author.displayName}`)
         const args = message.content.slice(4).trim().split('|');
         if (args.length === 0) return;
         const userCmd = args.shift()?.toLowerCase();
-        const cmd = supportedCommands.find(c=>c.command.equals(userCmd))
-        if(!cmd){
-            message.reply(`EZDM supported commands: ${supportedCommands.map(c=>c.command).join(',')}`)
+        const cmd = supportedCommands.find(c => c.command.equals(userCmd))
+        if (!cmd) {
+            console.log('Unknown command')
+            message.reply(`EZDM supported commands: ${supportedCommands.map(c => c.command).join(',')}`)
             return;
         }
+        console.log(`executing command ${cmd.command}`)
         return cmd.handler(genAI, args, message);
     })
 }

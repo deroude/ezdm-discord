@@ -46,7 +46,7 @@ export function runDiscordBot(genAI, db) {
         const args = message.content.slice(4).trim().split('|');
         if (args.length === 0) return;
         const userCmd = args.shift()?.toLowerCase();
-        const cmd = supportedCommands.find(c => c.command.equals(userCmd))
+        const cmd = supportedCommands.find(c => c.command === userCmd)
         if (!cmd) {
             console.log('Unknown command')
             message.reply(`EZDM supported commands: ${supportedCommands.map(c => c.command).join(',')}`)

@@ -26,7 +26,7 @@ jobs:
 
       - name: Trigger deploy
         run: |
-           ssh -i $SSH_KEY_PATH ezdm@ezdm.thedotin.ro "cd ~/ezdm-discord; git pull; npm ci"
+           ssh -i $SSH_KEY_PATH ezdm@ezdm.thedotin.ro "source ~/.bashrc; cd ~/ezdm-discord; git pull; npm ci"
         shell: bash
         env:
           SSH_KEY_PATH: ${{ github.workspace }}/../private.key

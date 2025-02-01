@@ -60,15 +60,9 @@ export function genAIService(db) {
     const generateLogSuggestion = async (userHint, sessionId) => {
         if (Object.keys(promptDefinitions).length === 0) { await reloadPrompts(); }
         const prompt = promptDefinitions['log'];
-        const session = await db.collection('sessions').doc(sessionId).get();
-        const adventure = await db.collection('adventures').doc(session.data().adventureId).get();
-        const characterRefs = session.data().characterIds.map((id) => db.collection('characters').doc(id));
-        const characters = await db.getAll(...characterRefs);
         const logDocs = await db.collection(`sessions/${sessionId}/log`).get();
         const systemInstruction = prompt.systemHint
-            .replace('#adventure', adventure.data().content)
-            .replace('#characters', characters.map(c => c.data().content).join('\n\n\n'))
-            .replace('#log', (logDocs.docs || []).map(doc => `Action: \n${doc.data().action}\n\n Resolution: \n${doc.data().resolution}`).join('\n\n\n'));
+            .replace('#adventure', (logDocs.docs || []).map(doc => doc.data().content).join('\n\n\n'));
         const promptText = prompt.promptPattern.replace('#userHint', userHint)
         return genAI.getGenerativeModel({ model }).generateContent({
             systemInstruction,
@@ -88,15 +82,9 @@ export function genAIService(db) {
     const generateLogResolution = async (action, context, roll, sessionId) => {
         if (Object.keys(promptDefinitions).length === 0) { await reloadPrompts(); }
         const prompt = promptDefinitions['log-resolution'];
-        const session = await db.collection('sessions').doc(sessionId).get();
-        const adventure = await db.collection('adventures').doc(session.data().adventureId).get();
-        const characterRefs = session.data().characterIds.map((id) => db.collection('characters').doc(id));
-        const characters = await db.getAll(...characterRefs);
         const logDocs = await db.collection(`sessions/${sessionId}/log`).get();
         const systemInstruction = prompt.systemHint
-            .replace('#adventure', adventure.data().content)
-            .replace('#characters', characters.map(c => c.data().content).join('\n\n\n'))
-            .replace('#log', (logDocs.docs || []).map(doc => `Action: \n${doc.data().action}\n\n Resolution: \n${doc.data().resolution}`).join('\n\n\n'));
+            .replace('#adventure', (logDocs.docs || []).map(doc => doc.data().content).join('\n\n\n'));
         const promptText = prompt.promptPattern
             .replace('#action', action)
             .replace('#context', context)

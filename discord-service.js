@@ -1,7 +1,11 @@
 import { Client, Events, GatewayIntentBits } from 'discord.js';
-import genChar from './commands/gen-char.js'
+import genChar from './commands/gen-char.js';
+import genAdv from './commands/gen-adv.js';
+import genResHint from './commands/gen-res-hint.js';
+import genRes from './commands/gen-res.js';
 
-const supportedCommands = [genChar]
+const supportedCommands = [genChar, genAdv, genResHint, genRes]
+const listeners = {};
 
 export function runDiscordBot(genAI, db) {
 
@@ -15,44 +19,77 @@ export function runDiscordBot(genAI, db) {
         console.log(`Ready! Logged in as ${readyClient.user.tag}`);
     });
 
-    // Log in to Discord with your client's token
-    client.login(process.env.DISCORD_BOT_TOKEN);
-
-    // client.on(Events.InteractionCreate, async interaction => {
-    // 	if (!interaction.isChatInputCommand()) return;
-
-    // 	const command = interaction.client.commands.get(interaction.commandName);
-
-    // 	if (!command) {
-    // 		console.error(`No command matching ${interaction.commandName} was found.`);
-    // 		return;
-    // 	}
-
-    // 	try {
-    // 		await command.execute(interaction);
-    // 	} catch (error) {
-    // 		console.error(error);
-    // 		if (interaction.replied || interaction.deferred) {
-    // 			await interaction.followUp({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
-    // 		} else {
-    // 			await interaction.reply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
-    // 		}
-    // 	}
-    // });
-
     client.on(Events.MessageCreate, async (message) => {
-        if (message.author.bot || !message.content.startsWith('&ezdm')) return;
-        console.log(`got a message from ${message.author.displayName}`)
+        if (message.author.bot) return;
+
+        if (message.content.trim() === '&ezdm listen') {
+            if (listeners.keys.includes(message.channel.id)) {
+                message.reply('EZDM says yeah, still here, keep talking');
+                return;
+            }
+            listeners[message.channel.id] = [];
+            message.reply('EZDM is listening');
+            return;
+        }
+
+        if (message.content.trim() === '&ezdm commit') {
+            const batch = db.batch();
+            for (const content of listeners[message.channel.id]) {
+                const dmsg = db.collection(`sessions/${message.channel.id}/log`).doc()
+                batch.set(dmsg, { content })
+            }
+            await batch.commit();
+            delete listeners[message.channel.id]
+            message.reply('EZDM saved the thread of the story');
+            return;
+        }
+
+        if (message.content.trim() === '&ezdm cancel') {
+            delete listeners[message.channel.id]
+            message.reply('EZDM is no longer listening');
+            return;
+        }
+
+        if (listeners.keys.includes(message.channel.id)) {
+
+            if (message.content.startsWith('&ezdm')) {
+                message.reply('EZDM is listening to a story thread and cannot execute other commands right now');
+                return;
+            }
+
+            if (listeners[message.channel.id].length === 10) {
+                delete listeners[message.channel.id]
+                message.reply('EZDM kaboom. Your story thread was forgotten');
+                return;
+            }
+
+            listeners[message.channel.id].push(message.content)
+
+            if (listeners[message.channel.id].length === 10) {
+                message.reply('EZDM has a short memory. If you add one more message, it will explode and forget your story thread.')
+            }
+            return;
+        }
+
+        if(!message.content.startsWith('&ezdm')){
+            return;
+        }
+
         const args = message.content.slice(6).trim().split('|');
         if (args.length === 0) return;
         const userCmd = args.shift()?.toLowerCase();
+
         const cmd = supportedCommands.find(c => c.command === userCmd)
         if (!cmd) {
             console.log('Unknown command')
-            message.reply(`EZDM supported commands: ${supportedCommands.map(c => c.command).join(',')}`)
+            message.reply(`EZDM supported commands:\n ${supportedCommands.map(c => `- ${c.example}`).join('\n')} \n- listen\n- commit\n- cancel`)
             return;
         }
         console.log(`executing command ${cmd.command}`)
         return cmd.handler(genAI, args, message);
     })
+
+
+    // Log in to Discord with your client's token
+    client.login(process.env.DISCORD_BOT_TOKEN);
 }

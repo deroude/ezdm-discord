@@ -10,5 +10,6 @@ export default {
         const charText = await genAI.generateCharacter(userHint, name, gender, clazz, race);
         const content = new AttachmentBuilder(Buffer.from(charText.response.text()), { name: `character-${name || ''}.markdown` })
         message.channel.send({ files: [content] });
-    }
+    },
+    example: 'gen-char|Rufus the Skinny|fighter|male|orc|tall, thin orc who left the hord because he felt rejected on account of his food disorder'
 }

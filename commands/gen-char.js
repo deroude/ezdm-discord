@@ -8,7 +8,7 @@ export default {
         const race = args.shift();
         const userHint = args.shift();
         const charText = await genAI.generateCharacter(userHint, name, gender, clazz, race);
-        const content = AttachmentBuilder(Buffer.from(charText.response.text()), { name: `character-${name || ''}.markdown` })
+        const content = new AttachmentBuilder(Buffer.from(charText.response.text()), { name: `character-${name || ''}.markdown` })
         message.channel.send({ files: [content] });
     }
 }

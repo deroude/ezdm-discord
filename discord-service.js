@@ -43,7 +43,7 @@ export function runDiscordBot(genAI, db) {
     client.on(Events.MessageCreate, async (message) => {
         if (message.author.bot || !message.content.startsWith('&ezdm')) return;
         console.log(`got a message from ${message.author.displayName}`)
-        const args = message.content.slice(4).trim().split('|');
+        const args = message.content.slice(6).trim().split('|');
         if (args.length === 0) return;
         const userCmd = args.shift()?.toLowerCase();
         const cmd = supportedCommands.find(c => c.command === userCmd)

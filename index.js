@@ -4,8 +4,8 @@ import * as admin from 'firebase-admin';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import { genAIService } from './ai-service';
-import { runDiscordBot } from './discord-service';
+import { genAIService } from './ai-service.js';
+import { runDiscordBot } from './discord-service.js';
 
 admin.initializeApp();
 const db = admin.firestore();

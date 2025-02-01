@@ -1,5 +1,5 @@
 import { Client, Events, GatewayIntentBits } from 'discord.js';
-import genChar from './commands/gen-char'
+import genChar from './commands/gen-char.js'
 
 const supportedCommands=[genChar]
 

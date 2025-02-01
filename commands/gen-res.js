@@ -5,7 +5,7 @@ export default {
         const context = args.shift();
         const roll = args.shift();
         const charText = await genAI.generateLogResolution(action, context, roll, message.channel.id);
-        message.reply(charText);
+        message.reply(charText.response.text());
     },
     example: 'gen-res|Magnus 7 Moustache Knots says: I know one of you no good pests took my scissors|Kodi clumsily tries to conceal the scissors|9'
 }

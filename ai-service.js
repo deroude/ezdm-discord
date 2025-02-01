@@ -64,7 +64,6 @@ export function genAIService(db) {
         const systemInstruction = prompt.systemHint
             .replace('#adventure', (logDocs.docs || []).map(doc => doc.data().content).join('\n\n\n'));        
         const promptText = prompt.promptPattern.replace('#userHint', userHint)
-        console.log('Gen Res', systemInstruction, promptText)
         return genAI.getGenerativeModel({ model }).generateContent({
             systemInstruction,
             contents: [

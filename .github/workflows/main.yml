@@ -1,4 +1,4 @@
-name: CI
+dm.name: CI
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
 
       - name: Trigger deploy
         run: |
-           ssh -i $SSH_KEY_PATH ezdm@thedotin.ro
+           ssh -i $SSH_KEY_PATH ezdm@ezdm.thedotin.ro
            cd ~/ezdm-discord
            git pull
            npm ci

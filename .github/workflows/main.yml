@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create SSH key
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$DEPLOY_KEY" > ../private.key
+          sudo chmod 600 ../private.key
+          ssh-keyscan ezdm.thedotin.ro >> ~/.ssh/known_hosts
+        shell: bash
+        env:
+          DEPLOY_KEY: ${{secrets.DEPLOY_KEY}}
+
+      - name: Trigger deploy
+        run: |
+           ssh -i $SSH_KEY_PATH ezdm@thedotin.ro
+           cd ~/ezdm-discord
+           git pull
+           npm ci
+           npm start
+        shell: bash
+        env:
+          SSH_KEY_PATH: ${{ github.workspace }}/../private.key

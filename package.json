@@ -1,0 +1,27 @@
+{
+  "name": "ezdm-discord",
+  "version": "1.0.0",
+  "description": "Easy Dungeon Master Bot for Discord",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deroude/ezdm-discord.git"
+  },
+  "keywords": [
+    "d&d",
+    "discord",
+    "ai"
+  ],
+  "author": "Valentin Raduti",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/deroude/ezdm-discord/issues"
+  },
+  "homepage": "https://github.com/deroude/ezdm-discord#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

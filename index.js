@@ -4,7 +4,7 @@ import * as admin from 'firebase-admin';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import { genAIService } from './services/ai-service';
+import { genAIService } from './ai-service';
 import { runDiscordBot } from './discord-service';
 
 admin.initializeApp();

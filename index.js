@@ -1,19 +1,19 @@
 'use strict';
 import 'dotenv/config';
-import * as admin from 'firebase-admin';
+import { initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore'
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { genAIService } from './ai-service.js';
 import { runDiscordBot } from './discord-service.js';
 
-admin.initializeApp();
-const db = admin.firestore();
+const gcp = initializeApp();
+const db = getFirestore(gcp);
 
 const genAI = genAIService(db);
 
 runDiscordBot(genAI, db);
-
 
 const app = express();
 // Middleware
@@ -30,5 +30,5 @@ const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
     console.log(`Dungeon Master Web listening ${port}`)
-  })
+})
 

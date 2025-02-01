@@ -23,7 +23,7 @@ export function runDiscordBot(genAI, db) {
         if (message.author.bot) return;
 
         if (message.content.trim() === '&ezdm listen') {
-            if (listeners.keys.includes(message.channel.id)) {
+            if (message.channel.id in listeners) {
                 message.reply('EZDM says yeah, still here, keep talking');
                 return;
             }
@@ -50,7 +50,7 @@ export function runDiscordBot(genAI, db) {
             return;
         }
 
-        if (listeners.keys.includes(message.channel.id)) {
+        if (message.channel.id in listeners) {
 
             if (message.content.startsWith('&ezdm')) {
                 message.reply('EZDM is listening to a story thread and cannot execute other commands right now');

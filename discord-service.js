@@ -80,7 +80,7 @@ export function runDiscordBot(genAI, db) {
                 return;
             }
             const args = message.content.slice(11).trim().split('|');
-            const topicReply = await genAI.startTalk(args[0], args[1]);
+            const topicReply = (await genAI.startTalk(args[0], args[1])).response.text();
             talks[message.channel.id] = [{
                 role: "model",
                 message: topicReply
@@ -97,7 +97,7 @@ export function runDiscordBot(genAI, db) {
             }
 
             talks[message.channel.id].push({ role: 'user', message: message.content })
-            const topicReply = await genAI.replyOnTalk(talks[message.channel.id]);
+            const topicReply = (await genAI.replyOnTalk(talks[message.channel.id])).response.text();
             talks[message.channel.id].push({
                 role: "model",
                 message: topicReply

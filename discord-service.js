@@ -7,6 +7,8 @@ import genRes from './commands/gen-res.js';
 const supportedCommands = [genChar, genAdv, genResHint, genRes]
 const listeners = {};
 
+const talks = {};
+
 export function runDiscordBot(genAI, db) {
 
     // Create a new client instance
@@ -46,6 +48,7 @@ export function runDiscordBot(genAI, db) {
 
         if (message.content.trim() === '&ezdm cancel') {
             delete listeners[message.channel.id]
+            delete talks[message.channel.id]
             message.reply('EZDM is no longer listening');
             return;
         }
@@ -71,7 +74,39 @@ export function runDiscordBot(genAI, db) {
             return;
         }
 
-        if(!message.content.startsWith('&ezdm')){
+        if (message.content.trim().startsWith('&ezdm talk')) {
+            if (message.channel.id in talks) {
+                message.reply('EZDM says yeah, still here, keep talking');
+                return;
+            }
+            const args = message.content.slice(11).trim().split('|');
+            const topicReply = await genAI.startTalk(args[0], args[1]);
+            talks[message.channel.id] = [{
+                role: "model",
+                message: topicReply
+            }];
+            message.channel.send(topicReply);
+            return;
+        }
+
+        if (message.channel.id in talks) {
+
+            if (message.content.startsWith('&ezdm')) {
+                message.reply('EZDM is listening to a story thread and cannot execute other commands right now');
+                return;
+            }
+
+            talks[message.channel.id].push({ role: 'user', message: message.content })
+            const topicReply = await genAI.replyOnTalk(talks[message.channel.id]);
+            talks[message.channel.id].push({
+                role: "model",
+                message: topicReply
+            });
+            message.channel.send(topicReply);
+            return;
+        }
+
+        if (!message.content.startsWith('&ezdm')) {
             return;
         }
 

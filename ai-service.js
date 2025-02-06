@@ -62,7 +62,7 @@ export function genAIService(db) {
         const prompt = promptDefinitions['log'];
         const logDocs = await db.collection(`sessions/${sessionId}/log`).get();
         const systemInstruction = prompt.systemHint
-            .replace('#adventure', (logDocs.docs || []).map(doc => doc.data().content).join('\n\n\n'));        
+            .replace('#adventure', (logDocs.docs || []).map(doc => doc.data().content).join('\n\n\n'));
         const promptText = prompt.promptPattern.replace('#userHint', userHint)
         return genAI.getGenerativeModel({ model }).generateContent({
             systemInstruction,
@@ -104,5 +104,42 @@ export function genAIService(db) {
         })
     }
 
-    return { generateAdventure, generateCharacter, generateLogSuggestion, generateLogResolution, reloadPrompts, promptDefinitions };
+    const startTalk = async (character, topic) => {
+        if (Object.keys(promptDefinitions).length === 0) { await reloadPrompts(); }
+        const prompt = promptDefinitions['talk'];
+        const promptText = prompt.promptPattern
+            .replace('#character', character)
+            .replace('#topic', topic)
+        return genAI.getGenerativeModel({ model }).generateContent({
+            systemInstruction: prompt.systemHint,
+            contents: [
+                {
+                    role: 'user',
+                    parts: [
+                        {
+                            text: promptText
+                        }
+                    ]
+                }
+            ]
+        })
+    }
+
+    const replyOnTalk = async (messageExchange) => {
+        if (Object.keys(promptDefinitions).length === 0) { await reloadPrompts(); }
+        const prompt = promptDefinitions['talk'];
+        return genAI.getGenerativeModel({ model }).generateContent({
+            systemInstruction: prompt.systemHint,
+            contents: messageExchange.map(m => ({
+                role: m.role,
+                parts: [
+                    {
+                        test: m.message
+                    }
+                ]
+            }))
+        })
+    }
+
+    return { generateAdventure, generateCharacter, generateLogSuggestion, generateLogResolution, reloadPrompts, startTalk, replyOnTalk, promptDefinitions };
 }

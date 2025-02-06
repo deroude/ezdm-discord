@@ -134,7 +134,7 @@ export function genAIService(db) {
                 role: m.role,
                 parts: [
                     {
-                        test: m.message
+                        text: m.message
                     }
                 ]
             }))
